@@ -1,21 +1,18 @@
-<script>
-export default {
-  name: "App",
-};
-</script>
-
 <template>
-  <NavBar />
-  <router-view />
+  <v-app>
+    <v-main>
+      <router-view/>
+    </v-main>
+  </v-app>
 </template>
 
-<style>
-* {
-  margin: 0;
-  padding: 0;
+<script>
+
+export default {
+  name: 'App',
+
+  data: () => ({
+    //
+  }),
 }
-#app {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-</style>
+</script>
