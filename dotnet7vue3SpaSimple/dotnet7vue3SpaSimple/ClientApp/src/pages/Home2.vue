@@ -44,7 +44,7 @@
                       md="4"
                     >
                       <v-text-field
-                        v-model="editedItem.name"
+                        v-model="editedItem.Name"
                         label="Dessert name"
                       ></v-text-field>
                     </v-col>
@@ -54,7 +54,7 @@
                       md="4"
                     >
                       <v-text-field
-                        v-model="editedItem.calories"
+                        v-model="editedItem.Calories"
                         label="Calories"
                       ></v-text-field>
                     </v-col>
@@ -64,7 +64,7 @@
                       md="4"
                     >
                       <v-text-field
-                        v-model="editedItem.fat"
+                        v-model="editedItem.Fat"
                         label="Fat (g)"
                       ></v-text-field>
                     </v-col>
@@ -74,7 +74,7 @@
                       md="4"
                     >
                       <v-text-field
-                        v-model="editedItem.carbs"
+                        v-model="editedItem.Carbs"
                         label="Carbs (g)"
                       ></v-text-field>
                     </v-col>
@@ -84,7 +84,7 @@
                       md="4"
                     >
                       <v-text-field
-                        v-model="editedItem.protein"
+                        v-model="editedItem.Protein"
                         label="Protein (g)"
                       ></v-text-field>
                     </v-col>
@@ -151,22 +151,11 @@
   </template>
 
 <script>
-import { ref, reactive, computed,onMounted,watch,nextTick  } from "vue";
+import { ref, reactive, computed,onMounted,watch,nextTick ,toRefs } from "vue";
+import { apiGetProductList,apiAddProduct,apiEditProduct,apiDeleteProduct} from "../services/api.service.js";
 export default {
     setup(){
-        const list = reactive(
-            [
-                {
-                    name: '11',
-                    age: '11',
-                    address: '11',
-                },
-                {
-                    name: '111',
-                    age: '111',
-                    address: '111',
-                }
-            ]);
+
 
         let dialog = ref(false);
         let dialogDelete = ref(false);
@@ -175,108 +164,38 @@ export default {
           title: 'Dessert (100g serving)',
           align: 'start',
           sortable: false,
-          key: 'name',
+          key: 'Name',
         },
-        { title: 'Calories', key: 'calories' },
-        { title: 'Fat (g)', key: 'fat' },
-        { title: 'Carbs (g)', key: 'carbs' },
-        { title: 'Protein (g)', key: 'protein' },
+        { title: 'Calories', key: 'Calories' },
+        { title: 'Fat (g)', key: 'Fat' },
+        { title: 'Carbs (g)', key: 'Carbs' },
+        { title: 'Protein (g)', key: 'Protein' },
         { title: 'Actions', key: 'actions', sortable: false },
         ]);
 
         let editedIndex = ref(-1);
         let editedItem = reactive({
-        name: '',
-        calories: 0,
-        fat: 0,
-        carbs: 0,
-        protein: 0,
+        Name: '',
+        Calories: 0,
+        Fat: 0,
+        Carbs: 0,
+        Protein: 0,
         });
         const defaultItem = reactive({
-        name: '',
-        calories: 0,
-        fat: 0,
-        carbs: 0,
-        protein: 0,
+        Name: '',
+        Calories: 0,
+        Fat: 0,
+        Carbs: 0,
+        Protein: 0,
         });
 
-        let desserts = reactive([]);
+        const dessert = reactive({desserts:[]});
 
         const initialize = () => {
-          const data = [
-          {
-            name: 'Frozen Yogurt',
-            calories: 159,
-            fat: 6.0,
-            carbs: 24,
-            protein: 4.0,
-          },
-          {
-            name: 'Ice cream sandwich',
-            calories: 237,
-            fat: 9.0,
-            carbs: 37,
-            protein: 4.3,
-          },
-          {
-            name: 'Eclair',
-            calories: 262,
-            fat: 16.0,
-            carbs: 23,
-            protein: 6.0,
-          },
-          {
-            name: 'Cupcake',
-            calories: 305,
-            fat: 3.7,
-            carbs: 67,
-            protein: 4.3,
-          },
-          {
-            name: 'Gingerbread',
-            calories: 356,
-            fat: 16.0,
-            carbs: 49,
-            protein: 3.9,
-          },
-          {
-            name: 'Jelly bean',
-            calories: 375,
-            fat: 0.0,
-            carbs: 94,
-            protein: 0.0,
-          },
-          {
-            name: 'Lollipop',
-            calories: 392,
-            fat: 0.2,
-            carbs: 98,
-            protein: 0,
-          },
-          {
-            name: 'Honeycomb',
-            calories: 408,
-            fat: 3.2,
-            carbs: 87,
-            protein: 6.5,
-          },
-          {
-            name: 'Donut',
-            calories: 452,
-            fat: 25.0,
-            carbs: 51,
-            protein: 4.9,
-          },
-          {
-            name: 'KitKat',
-            calories: 518,
-            fat: 26.0,
-            carbs: 65,
-            protein: 7,
-          },
-        ];
-            Object.assign(desserts, data);
-
+          apiGetProductList().then(res=>{
+            if(res.status == 200)
+            dessert.desserts = res.data;
+          })
         };
 
         const formTitle  = computed(()=> editedIndex.value === -1 ? 'New Item' : 'Edit Item');
@@ -294,28 +213,31 @@ export default {
         });
 
         const editItem =(item)=>{
-            editedIndex.value = desserts.indexOf(item);
-            // editedItem = Object.assign({}, item);
+            editedIndex.value = dessert.desserts.indexOf(item);
             Object.assign(editedItem, item);
             dialog.value = true;
         }; 
 
         const deleteItem = (item)=>{
-            editedIndex.value = desserts.indexOf(item);
-            // editedItem = Object.assign({}, item);
+            editedIndex.value = dessert.desserts.indexOf(item);
             Object.assign(editedItem, item);
             dialogDelete.value = true;
         };
 
         const deleteItemConfirm = ()=>{
-            desserts.splice(editedIndex.value, 1);
-            closeDelete();
+          const idx = editedIndex.value;
+          const item = dessert.desserts[idx];
+          apiDeleteProduct(item).then(res=>{
+            if(res.status == 200){
+              initialize();
+              closeDelete();
+            }
+          })
         };
 
         const close = ()=>{
             dialog.value = false;
             nextTick(() => {
-                // editedItem = Object.assign({}, defaultItem)
                 Object.assign(editedItem, defaultItem);
                 editedIndex.value = -1;
             });
@@ -324,26 +246,35 @@ export default {
         const closeDelete = ()=>{
             dialogDelete.value = false
             nextTick(() => {
-                // editedItem = Object.assign({}, defaultItem)
                 Object.assign(editedItem, defaultItem);
                 editedIndex.value = -1;
             })
         }
 
         const save = () => {
-            if (editedIndex.value > -1) {
-                Object.assign(desserts[editedIndex.value], editedItem);
-            } else {
-                const temp = Object.assign({}, editedItem);
-                desserts.push(temp);
+            const temp = Object.assign({}, editedItem);
+            const idx = editedIndex.value;          
+            if (idx > -1) {
+              apiEditProduct(temp).then(res=>{
+                if(res.status == 200){
+                  dessert.desserts[idx] = temp;
+                }
+              })            
+            } 
+            else {
+              apiAddProduct(temp).then(res=>{
+                if(res.status == 200){
+                  initialize();
+                }
+              })                
             }
             close();
         }
 
-        return { headers,desserts,editedIndex,editedItem,
+        return { headers,...toRefs(dessert),editedIndex,editedItem,
                  defaultItem,dialog,dialogDelete,formTitle,editItem, 
                  deleteItem,deleteItemConfirm,close,closeDelete,
-                 save
+                 save,initialize
                }
     }
 }
